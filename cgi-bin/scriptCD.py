@@ -19,8 +19,11 @@ def new_game(size=5):
 
 def do_move(current_move):
 
-    #create the board with
-    return "test"
+    #recreate a board using the board in the json object
+    sequence =  [item for sublist in data['board'] for item in sublist]
+    n = int(math.len(sequence))
+    
+
 
 
 
