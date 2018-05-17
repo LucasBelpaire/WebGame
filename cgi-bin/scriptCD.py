@@ -22,6 +22,7 @@ def do_move(current_move):
     #recreate a board using the board in the json object
     sequence =  [item for sublist in data['board'] for item in sublist]
     n = int(math.len(sequence))
+
     
 
 
