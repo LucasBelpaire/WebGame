@@ -24,9 +24,9 @@ def do_move(data):
     size = int(math.sqrt(len(sequence)))
     board_move = Rooster(size, sequence)
     board_move.druppel(data['move'])
+    if(board_move.gewonnen(data['move'])):
+        new_data['message'] = "won"
     return board_move
-
-
 
 
 class Rooster:
