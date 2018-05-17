@@ -9,43 +9,14 @@ var data = {
     message: ''
 };
 
-
-function handleItem(valueOfItem, a) {
-    let currentList = $('#listItems').children('option').map(function () {
-        return $(this).text()
-    }).get();
-
-    let data = {
-        action: a,
-        value: valueOfItem,
-        list: currentList
-    };
-
-    console.log(JSON.stringify(data));
-    fetch('cgi-bin/scriptCD.py?data=' + JSON.stringify(data))
-        .then(response => response.json())
-        .then(data => {
-            $('#listItems').children('option').remove();
-            console.log(data)
-            newItems = data['list'];
-            console.log(newItems)
-            let i = 0;
-            for (let item of newItems) {
-                console.log(item);
-                $('#listItems').append($('<option>', {
-                    value: i,
-                    text: item
-                }));
-                i += 1;
-            }
-        });
-}
+let score = 0;
 
 function interactWithScript(data) {
+    $('#score').text('Score: '+score);
     fetch('cgi-bin/scriptCD.py?data=' + JSON.stringify(data), {credentials: 'same-origin'})
         .then(response => response.json())
         .then(data => {
-
+            console.log(data)
             let newBoard = data['board'];
             let moves = data['moves'];
 
@@ -62,11 +33,10 @@ function interactWithScript(data) {
             $('#board').css({"display": "flex", "flex-direction": "column"})
             let index = 0;
             $.each(newBoard, function (i, row) {
-                console.log(index);
                 index += 1;
                 let rowOfBoard = $("<div class='row'></div>").css({"display": "flex"});
                 $.each(row, function (j, circle) {
-                    $(rowOfBoard).append($('<div id="individualCircle"></div>').css({"background-color": circle, "border-radius": "50%", "width": "50px", "height": "50px"}));
+                    $(rowOfBoard).append($('<div class="'+circle+'"></div>').css({"background-color": circle, "border-radius": "50%", "width": "50px", "height": "50px"}));
                 });
                 $('#board').append(rowOfBoard);
             });
@@ -74,19 +44,10 @@ function interactWithScript(data) {
 }
 
 function getCurrentBoard() {
-    let board = [];
-    let currentBoard = $('#board').children('.row').map(function () {
-        return $(this).text()
+    let currentBoard = $('#board').children().children('div').map(function () {
+        return $(this).attr('class');
     }).get();
-    for (let i = 0; i < currentBoard.length; i++) {
-        board.push(currentBoard[i].trim().split("\n"));
-        for (let j = 0; j < board[i].length; j++) {
-            board[i][j] = board[i][j].trim();
-        }
-    }
-
-    return board;
-
+    return currentBoard;
 }
 
 
@@ -96,7 +57,7 @@ $(document).ready(function () {
     interactWithScript(data);
 
     $('#addColor').click(function () {
-
+        score += 1;
         let currentBoard = getCurrentBoard();
         let selectedOption = $('#selectColors').find(":selected").text();
         data['action'] = "do_move";
@@ -107,6 +68,7 @@ $(document).ready(function () {
 
     $('#newGame').click(function () {
         data['action'] = 'new_game';
+        score = 0;
         interactWithScript(data);
     });
 

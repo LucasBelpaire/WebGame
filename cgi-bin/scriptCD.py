@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-#Author: Lucas Belpaire
 
 import json
 import cgi
 import random
+import math
 
 
 # logic/functions
@@ -17,13 +17,13 @@ def new_game(size=5):
 
     return Rooster(size, sequence)
 
-def do_move(current_move):
 
-    #recreate a board using the board in the json object
-    sequence =  [item for sublist in data['board'] for item in sublist]
-    n = int(math.len(sequence))
+def do_move(data):
+    #recreate board passed on by the json object
+    sequence = data['board']
+    size = int(math.sqrt(len(sequence)))
 
-    
+    return board
 
 
 
@@ -39,11 +39,10 @@ class Rooster:
 
         # letters invullen, ook positie van * opslaan
         index = 0
+        self.druppeltegel = (0,0)
         for i in range(self.height):
             for j in range(self.width):
                 self.rooster[i][j] = sequence[index].lower()
-                if sequence[index] == "*":
-                    self.druppeltegel = (i, j)
                 index += 1
 
         # nodig in druppel methode
@@ -121,8 +120,6 @@ class Rooster:
 # get the data
 data = json.loads(cgi.FieldStorage().getvalue('data'))
 
-print(data)
-
 new_data = dict()
 
 if data['action'] == 'new_game':
@@ -131,6 +128,8 @@ if data['action'] == 'new_game':
     new_data['moves'] = board.getAllColors()
 elif data['action'] == 'do_move':
     board = do_move(data)
+    new_data["board"] = board.getRooster()
+    new_data['moves'] = board.getAllColors()
 
 '''
 STUUR CGI ANTWOORD TERUG
