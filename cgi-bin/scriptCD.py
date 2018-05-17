@@ -22,8 +22,9 @@ def do_move(data):
     #recreate board passed on by the json object
     sequence = data['board']
     size = int(math.sqrt(len(sequence)))
-
-    return board
+    board_move = Rooster(size, sequence)
+    board_move.druppel(data['move'])
+    return board_move
 
 
 
@@ -42,7 +43,7 @@ class Rooster:
         self.druppeltegel = (0,0)
         for i in range(self.height):
             for j in range(self.width):
-                self.rooster[i][j] = sequence[index].lower()
+                self.rooster[i][j] = sequence[index]
                 index += 1
 
         # nodig in druppel methode
@@ -110,7 +111,7 @@ class Rooster:
         colors = set()
         for i in range(self.height):
             for j in range(self.width):
-                colors.add(self.rooster[i][j])
+                colors.add(self.rooster[i][j].lower())
         return sorted(list(colors))
 
     def getRooster(self):

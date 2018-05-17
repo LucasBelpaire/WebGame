@@ -16,7 +16,7 @@ function interactWithScript(data) {
     fetch('cgi-bin/scriptCD.py?data=' + JSON.stringify(data), {credentials: 'same-origin'})
         .then(response => response.json())
         .then(data => {
-            console.log(data)
+            console.log(data);
             let newBoard = data['board'];
             let moves = data['moves'];
 
@@ -36,7 +36,8 @@ function interactWithScript(data) {
                 index += 1;
                 let rowOfBoard = $("<div class='row'></div>").css({"display": "flex"});
                 $.each(row, function (j, circle) {
-                    $(rowOfBoard).append($('<div class="'+circle+'"></div>').css({"background-color": circle, "border-radius": "50%", "width": "50px", "height": "50px"}));
+                    console.log(circle);
+                    $(rowOfBoard).append($('<div id="'+circle+'"></div>').css({"background-color": circle, "border-radius": "50%", "width": "50px", "height": "50px"}));
                 });
                 $('#board').append(rowOfBoard);
             });
@@ -45,7 +46,7 @@ function interactWithScript(data) {
 
 function getCurrentBoard() {
     let currentBoard = $('#board').children().children('div').map(function () {
-        return $(this).attr('class');
+        return $(this).attr('id');
     }).get();
     return currentBoard;
 }
@@ -59,10 +60,11 @@ $(document).ready(function () {
     $('#addColor').click(function () {
         score += 1;
         let currentBoard = getCurrentBoard();
+        console.log(currentBoard);
         let selectedOption = $('#selectColors').find(":selected").text();
         data['action'] = "do_move";
         data['board'] = currentBoard;
-        data['move'] = selectedOption;
+        data['move'] = selectedOption.toUpperCase();
         interactWithScript(data)
     });
 
