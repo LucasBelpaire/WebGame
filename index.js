@@ -67,17 +67,6 @@ $(document).ready(function () {
     data['action'] = 'new_game';
     interactWithScript(data);
 
-    $('#addColor').click(function () {
-        let currentBoard = getCurrentBoard();
-        let selectedOption = $('#selectColors').find(":selected").text();
-        data['action'] = "do_move";
-        data['board'] = currentBoard;
-        data['move'] = selectedOption.toUpperCase();
-        data['co'] = [0,0];
-        data['score'] = score;
-        interactWithScript(data)
-    });
-
     $('#newGame').click(function () {
         data['action'] = 'new_game';
         data['score'] = 0;
