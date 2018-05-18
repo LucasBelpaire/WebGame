@@ -20,12 +20,17 @@ def new_game(size=5):
 
 def do_move(data):
     #recreate board passed on by the json object
+    #check if the coordinates are (0,0), which is the only allowed value for this game
     sequence = data['board']
     size = int(math.sqrt(len(sequence)))
     board_move = Rooster(size, sequence)
-    board_move.druppel(data['move'])
-    if(board_move.gewonnen(data['move'])):
-        new_data['message'] = "won"
+    new_data['score'] = data['score']
+    if data['co'] == [0, 0]:
+        board_move.druppel(data['move'])
+        new_data['score'] += 1
+        if board_move.gewonnen(data['move']):
+            new_data['message'] = "won"
+
     return board_move
 
 
@@ -127,6 +132,7 @@ if data['action'] == 'new_game':
     board = new_game()
     new_data['board'] = board.getRooster()
     new_data['moves'] = board.getAllColors()
+    new_data['score'] = 0
 elif data['action'] == 'do_move':
     board = do_move(data)
     new_data["board"] = board.getRooster()

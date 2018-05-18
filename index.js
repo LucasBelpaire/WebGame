@@ -2,22 +2,25 @@
 * Author: Lucas Belpaire
 * */
 
-var data = {
+let data = {
     action: '',
     board: '',
     moves: '',
-    message: ''
+    message: '',
+    co: ''
 };
 
 let score = 0;
 
 function interactWithScript(data) {
-    $('#score').text('Score: '+score);
     fetch('cgi-bin/scriptCD.py?data=' + JSON.stringify(data), {credentials: 'same-origin'})
         .then(response => response.json())
         .then(data => {
             let newBoard = data['board'];
             let moves = data['moves'];
+            score = data['score'];
+
+            $('#score').text('Score: '+score);
 
             //fill in all the options the player can select
             $('#selectColors').children('option').remove();
@@ -29,31 +32,35 @@ function interactWithScript(data) {
 
             //fill in the board
             $('#board').children('div').remove();
-            $('#board').css({"display": "flex", "flex-direction": "column"})
-            let index = 0;
+            $('#board').css({"display": "flex", "flex-direction": "column"});
+            let rowNumber = 0;
+            let columnNumber = 0;
             $.each(newBoard, function (i, row) {
-                index += 1;
-                let rowOfBoard = $("<div class='row'></div>").css({"display": "flex"});
+                columnNumber = 0;
+                let rowOfBoard = $("<div></div>").css({"display": "flex"});
                 $.each(row, function (j, circle) {
-                    $(rowOfBoard).append($('<div id="'+circle+'"></div>').css({"background-color": circle, "border-radius": "50%", "width": "50px", "height": "50px"}));
+                    $(rowOfBoard).append($('<div class="clickable" data-row="'+rowNumber+'" data-column="'+columnNumber+'" id="'+circle+'"></div>').css({"background-color": circle, "border-radius": "50%", "width": "50px", "height": "50px"}));
+                    columnNumber += 1;
                 });
                 $('#board').append(rowOfBoard);
+                rowNumber += 1;
             });
 
             if(data['message']){
                 alert("Congratulations, you have won!\nYour score is: "+score);
+                data['action'] = 'new_game';
+                score = 0;
+                interactWithScript(data);
             }
 
         })
 }
 
 function getCurrentBoard() {
-    let currentBoard = $('#board').children().children('div').map(function () {
+    return $('#board').children().children('div').map(function () {
         return $(this).attr('id');
     }).get();
-    return currentBoard;
 }
-
 
 $(document).ready(function () {
 
@@ -61,19 +68,36 @@ $(document).ready(function () {
     interactWithScript(data);
 
     $('#addColor').click(function () {
-        score += 1;
         let currentBoard = getCurrentBoard();
         let selectedOption = $('#selectColors').find(":selected").text();
         data['action'] = "do_move";
         data['board'] = currentBoard;
         data['move'] = selectedOption.toUpperCase();
+        data['co'] = [0,0];
+        data['score'] = score;
         interactWithScript(data)
     });
 
     $('#newGame').click(function () {
         data['action'] = 'new_game';
+        data['score'] = 0;
         score = 0;
         interactWithScript(data);
     });
+
+});
+
+$(document).on('click', ".clickable", function() {
+    let currentBoard = getCurrentBoard();
+    let selectedOption = $('#selectColors').find(":selected").text();
+    let rowNumber = $(this).data("row");
+    let columnNumber = $(this).data("column");
+    data['action'] = "do_move";
+    data['board'] = currentBoard;
+    data['move'] = selectedOption.toUpperCase();
+    data['co'] = [rowNumber, columnNumber];
+    data['score'] = score;
+    interactWithScript(data)
+
 
 });
